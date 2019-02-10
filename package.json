@@ -1,0 +1,27 @@
+{
+  "name": "eth_traceability",
+  "version": "1.0.0",
+  "description": "Supplychain traceability using ETH network",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha",
+    "dev": "next dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FernandoGBR/ETH_Traceability.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FernandoGBR/ETH_Traceability/issues"
+  },
+  "homepage": "https://github.com/FernandoGBR/ETH_Traceability#readme",
+  "dependencies": {
+    "mocha": "^5.2.0",
+    "next": "^7.0.3",
+    "react": "^16.8.1",
+    "react-dom": "^16.8.1",
+    "web3": "^1.0.0-beta.46"
+  }
+}

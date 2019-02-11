@@ -9,6 +9,8 @@ contract TraceabilityContract {
     address[] producers;
     mapping (address => address[]) transportersOf; //List of transporters of an entity
     mapping (address => address[]) transportersTo; //List of entities of a transporter
+    mapping (address => address) requestTransport; // Lista de pedidos de transporte
+    mapping (address => address) inTransport; // Lista de pedidos en transporte
     mapping (address => address[]) certifierOf; //List of cerifiers of a producer
     mapping (address => address[]) certifierTo; //List of producers certified by a certifier
     
@@ -66,13 +68,47 @@ contract TraceabilityContract {
         return true;
     }
     
-    function useTransporter(address addressToUse) public returns (bool success){
+    function useTransporter(address addressToUse, address assetAddress) public returns (bool success){
         require(roles[addressToUse] == 3, "addressToUse is not a transporter");
         require(roles[msg.sender] == 1 || roles[msg.sender] == 2, "Only superAdmin and producers can use transporters" );
+        require(assetOwner[assetAddress] == msg.sender, "Only owner to asset can useTransporter");
         
         transportersOf[msg.sender].push(addressToUse);
         transportersTo[addressToUse].push(msg.sender);
         
+        requestTransport[assetAddress]=addressToUse;//add request to transfer
+        return true;
+    }
+    function initTransporter(address addressFromInit, address assetAddress, string memory _JSON) public returns (bool success){
+        require(roles[addressFromInit] == 2 || roles[addressFromInit] == 5, "addressFromInit is producers or shop");
+        require(roles[msg.sender] == 3 , "Only transporters can init transport" );
+        require(requestTransport[assetAddress] == msg.sender, "Only can init transporter if asset have requestTransport");
+
+        //transporte iniciado
+        //añadir informacion de transaction al asset
+        Asset(assetAddress).addTransaction(2 , addressFromInit, msg.sender, _JSON);
+        requestTransport[assetAddress] = address(0);
+        inTransport[assetAddress] = msg.sender;
+        return true;
+    }
+    function finishTransporter(address addressToFinish, address assetAddress, string memory _JSON) public returns (bool success){
+        require( roles[addressToFinish] == 5, "addressToFinish is a shop");
+        require(roles[msg.sender] == 3 , "Only transporters can finish transport" );
+        require(inTransport[assetAddress] == msg.sender, "Only can finish transporter if asset have inTransport");
+
+        //transporte finalizado por parte del transportista
+        Asset(assetAddress).addTransaction(2 , msg.sender, addressToFinish, _JSON);
+        //send event para avisar a la tienda
+        return true;
+    }
+        function receiveAsset(address addressToTransport, address assetAddress, string memory _JSON) public returns (bool success){
+        require( roles[addressToTransport] == 2, "addressToTransport is not transporter");
+        require(roles[msg.sender] == 5 , "Only shop can receive Asset" );
+        require(inTransport[assetAddress] == addressToTransport, "Only can finish transporter if asset have inTransport");
+
+        //transporte finalizado por parte de la tienda
+        Asset(assetAddress).addTransaction(3 , addressToTransport,msg.sender , _JSON);
+        inTransport[assetAddress] = address(0);
         return true;
     }
     
@@ -83,7 +119,7 @@ contract TraceabilityContract {
         certifierOf[msg.sender].push(addressToUse);
         certifierTo[addressToUse].push(msg.sender);
         
-        roles[addressToUse] = 4;
+        //roles[addressToUse] = 4;
         return true;
     }
     
@@ -92,7 +128,8 @@ contract TraceabilityContract {
         
         Asset asset = new Asset(msg.sender, _JSON);
         
-        //TODO: Get asset address
+           //No se puede recoger el address del assert recien creado, tiene que confirmarse en la blockchain, por tanto llamamos a un evento y con web3 capturaremos ese evento y recogeremos el address del contrato creado
+           // https://ethereum.stackexchange.com/questions/35679/how-to-return-address-from-newly-created-contract
         address assetAddress;
         
         assetsOwned[msg.sender].push(assetAddress);
@@ -105,7 +142,7 @@ contract TraceabilityContract {
 
 contract Asset {
     struct transaction {
-        uint8 transactionType; //1. Creation
+        uint8 transactionType; //1. Creation 2.Transporter 3. In shop 
         address address1;
         address address2;
         string description;
@@ -123,6 +160,17 @@ contract Asset {
         t.description = _description;
         t.address1 = _creator;
         t.date = now;
+        transactions.push(t);
+    }
+    function addTransaction(uint8 _transactionType, address _address1, address _address2, string memory _description) public{
+        
+         transaction memory t;
+        t.transactionType = _transactionType;
+        t.description = _description;
+        t.address1 = _address1;
+        t.address1 = _address2;
+        t.date = now;
+        transactions.push(t);
     }
 }
 

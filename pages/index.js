@@ -24,7 +24,19 @@ class traceabilityIndex extends Component {
         if(!this.state.isAdmin) e.preventDefault();
     }
 
-    render(){        
+    render(){   
+        let adminButton;
+        if(this.state.isAdmin){
+            adminButton =  <Link href='/admin' onClick={this.handleAdminClick}>
+                                <a>
+                                    <Button primary fluid>Admin</Button>
+                                </a>
+                            </Link>;
+
+        }else{
+            adminButton = <Button primary fluid disabled={!this.state.isAdmin}>Admin</Button>;       
+        }
+        
         return (
             <Layout>
                 <div>
@@ -52,11 +64,7 @@ class traceabilityIndex extends Component {
                         </a>
                     </Link>
                     <br />
-                    <Link href='/admin' onClick={this.handleAdminClick}>
-                        <a>
-                            <Button primary fluid disabled={!this.state.isAdmin}>Admin</Button>
-                        </a>
-                    </Link>                              
+                    {adminButton}                             
                 </div>            
             </Layout>
         );

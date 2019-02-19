@@ -70,7 +70,7 @@ contract Transporters_Users{
     {   
         require(msg.sender == traceabilityContract, "only TC can do this call");
         require(
-            isTransporterOfUser(_transporterAddress, msg.sender) == true, 
+            isTransporterOfUser(_transporterAddress, _userAddress), 
             "transporter is not partner of message sender"
         );      
 

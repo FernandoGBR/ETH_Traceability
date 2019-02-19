@@ -5,6 +5,7 @@ contract Transporters_Users{
     
 
     enum TransportState { PendingStart, Transporting, PendingEnd}
+
     struct Transport {
         TransportState state;
 
@@ -27,7 +28,7 @@ contract Transporters_Users{
         mapping(address => Transport) pendingTransports; // address = addressAsset
         address[] pendingTransportsList;
 
-        //pending transport for a determinate transporter for a determinate user (producer)
+        //active transport for a determinate transporter for a determinate user (producer)
         mapping(address => Transport) activeTransports; // address = addressAsset
         address[] activeTransportsList;        
     }
@@ -69,7 +70,7 @@ contract Transporters_Users{
     {   
         require(msg.sender == traceabilityContract, "only TC can do this call");
         require(
-            isTransporterOfUser(_transporterAddress, msg.sender) == false, 
+            isTransporterOfUser(_transporterAddress, msg.sender) == true, 
             "transporter is not partner of message sender"
         );      
 
@@ -108,5 +109,19 @@ contract Transporters_Users{
 
     function getTransportReceiver(address _userAddress, address _transporterAddress, address _assetAddress) public view returns (address to){
         return tuMatrix[_transporterAddress][_userAddress].activeTransports[_assetAddress].to;
+    }
+
+    function deleteTransport(address _userAddress, address _transporterAddress, address _assetAddress) public{
+        require(msg.sender == traceabilityContract, "only TC can do this call");
+
+        address[] storage activeTransportArray = tuMatrix[_transporterAddress][_userAddress].activeTransportsList;
+        Transport storage t = tuMatrix[_transporterAddress][_userAddress].activeTransports[_assetAddress];
+        //Delete from active
+        uint rowToDelete = t.index;
+        address keyToMove = activeTransportArray[activeTransportArray.length - 1];
+
+        activeTransportArray[rowToDelete] = keyToMove;
+        tuMatrix[_transporterAddress][_userAddress].activeTransports[keyToMove].index = rowToDelete;
+        activeTransportArray.length --;
     }
 }

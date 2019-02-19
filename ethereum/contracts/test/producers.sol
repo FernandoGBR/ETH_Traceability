@@ -43,7 +43,7 @@ contract Producers {
         require(msg.sender == traceabilityContract, "only TC can do this call");
         require(isProducer(_producerAddress), "Only producers can create assets");
 
-        asset = address(new Asset(msg.sender, _JSON));        
+        asset = address(new Asset(_producerAddress, _JSON));        
         producers[msg.sender].assetsCreatedIndex[asset] = producers[msg.sender].assetsCreatedList.push(asset) - 1;
                
         return asset;

@@ -11,7 +11,7 @@ contract Asset { //is owned?
         string description;
         uint date;
     }
-    AssetState assetState;
+    AssetState public assetState;
     address traceabilityContract; 
     address public owner;
     transaction[] public transactions;

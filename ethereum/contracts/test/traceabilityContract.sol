@@ -164,14 +164,13 @@ contract TraceabilityContract is owned {
         //add transaction to the asset history
         Asset(_assetAddress).endTransport();
         
+        (address _from, address _transporter) = Asset(_assetAddress).getTransportData();
         // delete transport from transporter
-        //tuContract.deleteTransport(from, transp, asset);
+        tuContract.deleteTransport(_from, _transporter, _assetAddress);
         
         
         // add asset to shop
-        // shops.receiveAsset(shop, asset);
-        // shops[msg.sender].assetsIndex[_assetAddress] = shops[msg.sender].assetsList.push(_assetAddress) - 1;        
-        
+        shopsContract.receiveAsset(msg.sender, _assetAddress);
         return true;
     }
 

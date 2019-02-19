@@ -59,7 +59,5 @@ contract Shops {
         shops[_shopAddress].assetsIndex[_assetAddress] = shops[_shopAddress].assetsList.push(_assetAddress) - 1;
 
         return true;
-
-
     }
 }

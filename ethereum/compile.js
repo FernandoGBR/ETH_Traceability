@@ -25,7 +25,6 @@ var input = {
 	}
 }
 
-
 var output = JSON.parse(solc.compile(JSON.stringify(input)));
 //const output = solc.compile(source, 1).contracts;
 

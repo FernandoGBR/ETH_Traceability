@@ -14,9 +14,6 @@ contract Producers {
 
         mapping(address => uint) assetsCreatedIndex;
         address[] assetsCreatedList;
-
-        //mapping(address => Transporter_User) transporters; //address = transporterAddress
-        //Transporter_User[] transportersList;         
     }
     mapping (address => Producer) private producers;
     address[] public producersIndex;

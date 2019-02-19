@@ -9,9 +9,6 @@ contract Transporters {
         string registrationData; //extra data given on register
 
         uint index; // index on the global transporter list
-
-        mapping(address => bool) users; //address == userAddress
-        address[] usersList;        
     }    
     mapping (address => Transporter) private  transporters;
     address[] public transportersList;

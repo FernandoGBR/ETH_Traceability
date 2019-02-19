@@ -4,45 +4,50 @@ const fs =  require('fs-extra');
 
 const buildPath = path.resolve(__dirname,'build');
 fs.removeSync(buildPath);
+fs.ensureDirSync(buildPath);
 
-const contractPath = path.resolve(__dirname,'contracts', 'traceabilityContract.sol');
+compileFromFile('owned.sol');
+compileFromFile('asset.sol');
+compileFromFile('shops.sol');
+compileFromFile('transporters_users.sol'); 
+compileFromFile('transporters.sol');
+compileFromFile('producers.sol');
+compileFromFile('traceabilityContract.sol'); 
 
-const source = fs.readFileSync(contractPath,'utf8');
+function compileFromFile(fileName) {
+	const contractPath = path.resolve(__dirname,'contracts', fileName);
 
-var input = {
-	language: 'Solidity',
-	sources: {
-		'traceabilityContract.sol': {
-			content: source
-		}
-	},
-	settings: {
-		outputSelection: {
-			'*': {
-				'*': [ '*' ]
+	const source = fs.readFileSync(contractPath,'utf8');
+
+	var input = {
+		language: 'Solidity',
+		sources: {
+			[fileName]: {
+				content: source
+			}
+		},
+		settings: {
+			outputSelection: {
+				'*': {
+					'*': [ '*' ]
+				}
 			}
 		}
 	}
+
+	var output = JSON.parse(solc.compile(JSON.stringify(input), findImports));
+
+	//console.log(output.contracts);
+	
+	for (let contract in output.contracts[fileName]) {
+		fs.outputJSONSync(
+			path.resolve(buildPath,contract.replace(':', '') + '.json'),
+			output.contracts[fileName][contract]
+		);
+	}
 }
 
-var output = JSON.parse(solc.compile(JSON.stringify(input)));
-//const output = solc.compile(source, 1).contracts;
-
-fs.ensureDirSync(buildPath);
-
-/*for ( let contract in output) {
-    fs.outputJSONSync(
-        path.resolve(buildPath,contract.replace(':', '') + '.json'),
-        output[contract]
-    );
-}*/
-
-for (let contract in output.contracts['traceabilityContract.sol']) {
-    fs.outputJSONSync(
-        path.resolve(buildPath,contract.replace(':', '') + '.json'),
-        output.contracts['traceabilityContract.sol'][contract]
-    );
+function findImports(pathToImport){	
+	const importPath = path.resolve(__dirname,'contracts', pathToImport);
+	return {contents: fs.readFileSync(importPath,'utf8')};		 
 }
-
-
-

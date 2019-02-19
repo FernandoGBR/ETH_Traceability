@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-import "./transporters_users.sol";
 import "./asset.sol";
 
 contract Producers {

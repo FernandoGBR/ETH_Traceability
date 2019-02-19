@@ -34,7 +34,7 @@ class traceabilityIndex extends Component {
                             </Link>;
 
         }else{
-            adminButton = <Button primary fluid disabled={!this.state.isAdmin}>Admin</Button>;       
+            adminButton = <Button primary fluid disabled>Admin</Button>;       
         }
         
         return (

@@ -2,7 +2,7 @@ pragma solidity ^0.5.0;
 
 contract owned {
     constructor() public{ owner = msg.sender; }
-    address owner;
+    address public owner;
 
     modifier onlyOwner {
         require(msg.sender == owner, "Only owner");
@@ -11,7 +11,7 @@ contract owned {
 }
 
 
-contract Asset { //is owned?
+contract Asset { 
 
     enum AssetState {Waiting, PendingTransport, InTransport, PendingReceipt, Consumed}
     enum TransactionType {Creation, TransportStartRequest, TransportStart, TransportEndRequest, TransportEnd, Consume}
@@ -22,7 +22,7 @@ contract Asset { //is owned?
         string description;
         uint date;
     }
-    AssetState public assetState;
+    AssetState assetState;
     address traceabilityContract; 
     address public owner;
     transaction[] public transactions;
@@ -43,6 +43,7 @@ contract Asset { //is owned?
 
     function askForTransport(address _from, address _to) public{
         require(_from == owner, "Only owner of the asset can ask for transport");
+        require(assetState == AssetState.Waiting, "Can not ask for transport if asset is not waiting");
         assetState = AssetState.PendingTransport;
         transaction memory _t;
         _t.transactionType = TransactionType.TransportStartRequest;
@@ -350,11 +351,7 @@ TODO refactor this and add attachCertifier();
         require(
             isTransporterOfUser(_transporterAddress, msg.sender) == false, 
             "transporter is not partner of message sender"
-        );
-        require(
-            Asset(_assetAddress).assetState() == Asset.AssetState.Waiting, //TODO refactor
-            "wrong asset status, only Waiting assets can be used to request transport"
-        );
+        );        
 
         //check for asset ownership       
         require(

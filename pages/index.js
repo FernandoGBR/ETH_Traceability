@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import {Button} from 'semantic-ui-react';
 import Layout from '../components/Layout';
 import Link from 'next/link'
-import web3 from '../ethereum/web3';
-import {TraceabilityContract} from "../ethereum/contracts";
 
 //TODO hacer que los 4 primeros botones esten en un grid 2x2
 //Poner el boton de admin abajo del todo y deshabilitarlo si no es admin
